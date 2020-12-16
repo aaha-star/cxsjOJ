@@ -1,0 +1,148 @@
+<!DOCTYPE html>
+<html>
+    <head>
+        <meta charset="utf-8">
+        <title>考试管理</title>
+        <link rel="stylesheet" href="../css/bootstrap/dist/bootstrap.css">
+        <link rel="stylesheet" href="../css/bootstrap/dist/bootstrap-datetimepicker.css">
+        <link rel="stylesheet" href="../css/bootstraptable/dist/bootstrap-table.css">
+        <script src="../js/jquery/dist/jquery.js"></script>
+        <script src="../js/bootstrap/bootstrap.js"></script>
+        <script src="../js/bootstraptable/dist/bootstrap-table.js"></script>
+        <script src="../js/bootstrap/bootstrap-datetimepicker.js"></script>
+        <script src="../js/bootstrap/bootstrap-datetimepicker.zh-CN.js"></script>
+    </head>
+    
+<body>
+ <nav class="navbar navbar-inverse" role="navigation">
+        <div class="container-fluid">
+        <div class="navbar-header">
+            <a class="navbar-brand" href="#">oj系统</a>
+        </div>
+        <div>
+            <ul class="nav navbar-nav">
+                <li><a href="../html/persondata.html">个人信息</a></li>
+                <li><a href="../html/item.html">题目管理</a></li>
+                <li><a href="../html/exam.html">考试管理</a></li>
+            </ul>
+        </div>
+        </div>
+</nav>
+
+<table class="table table-condensed" id="table">
+</table>
+
+<script>
+    var datas1=[]
+    $(function(){
+            var i=0;
+            var id= window.location.href.split("?")[1].split("=")[1];
+			console.log(id)
+            var data={}
+			data.identity="teacher"
+			var jsonStr=JSON.stringify(data)
+			var turl='http://mengxun.online/api/oj/exam/'+id+''
+			$.ajax({
+							contentType: 'application/json;charset=UTF-8',
+							type: 'post',
+							url:turl,
+							data:jsonStr,
+							success:function(res){                          
+							datas=res.data
+                            ids=datas.Qids
+                            console.log(ids)
+						    for(s=0;s<ids.length;++s){
+                                var data1={}
+                                data1.identity="teacher"
+                                var jsonStr=JSON.stringify(data1)
+                                var turl='http://mengxun.online/api/oj/question/'+ids[s]+''
+                                $.ajax({
+                                contentType: 'application/json;charset=UTF-8',
+                                type: 'post',
+                                url:turl,
+                                data:jsonStr,
+                                success:function(res){
+                                    var viewdata=res.data                                                                    
+                                    if(i<s){
+                                        datas1[i]=viewdata
+                                        i++
+                                    }
+                                    if(i==s){
+                                        setTimeout('load()',1000);
+                                    }
+
+                                    },
+                                    error:function(data){
+                                        console.log(data.responseJSON)
+                                        console.log(data.responseText)
+                                    },
+                                 })
+                        }//for循环结束
+					},
+							error:function(data){
+								console.log(data.responseJSON)
+								console.log(data.responseText)
+							},
+            })
+    })
+
+function actionFormatter(value, row, index) {
+             var id = value;
+             var result = "";
+             result += "<a href='itemview.html?id="+id+"' class='btn btn-xs green' onclick=\"ViewById('" + id + "', view='view')\" title='查看'><span class='glyphicon glyphicon-search' value></span></a>";
+             return result;
+         }
+
+function load(){
+    var i=0
+        for(i=0;i<datas1.length;++i){
+            datas1[i].UpdateAt=datas1[i].UpdateAt.substring(0,10)+' '+datas1[i].UpdateAt.substring(11,19)
+            switch(datas1.Diff){
+                case 0:datas1[i].Diff.Diff='容易' ;break;
+				case 1:datas1[i].Diff.Diff='中等' ;break;
+				case 2:datas1[i].Diff.Diff='困难' ;break;
+            }
+        }
+        console.log(datas1)
+        $('#table').bootstrapTable({
+            columns: [
+					{
+					field: 'Number',
+					title: '序号',
+					align: 'center',
+					formatter: function (value, row, index) {
+						var pageSize = $('#table').bootstrapTable('getOptions').pageSize;     //通过table的#id 得到每页多少条
+						var pageNumber = $('#table').bootstrapTable('getOptions').pageNumber; //通过table的#id 得到当前第几页
+						return pageSize * (pageNumber - 1) + index + 1;    // 返回每条的序号： 每页条数 *（当前页 - 1 ）+ 序号
+					}
+					},
+					{
+						field: 'Name',
+						title: '题目名'
+					}, 
+					{
+						field: 'Diff',
+						title: '难度'
+					},
+					{
+						field: 'UpdateAt',
+						title: '最后更新时间',
+					
+					},
+					{
+						field:'ID',
+						title: '操作',
+						width: 120,
+						align: 'center',
+						valign: 'middle',
+						formatter: actionFormatter
+					} ,
+				],
+            data: datas1
+        });
+
+}
+</script>
+        
+</body>
+</html>

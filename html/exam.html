@@ -1,0 +1,643 @@
+<!DOCTYPE html>
+<head>
+	<meta charset="utf-8">
+    <title>考试管理</title>
+    <link rel="stylesheet" href="../css/bootstrap/dist/bootstrap.css">
+    <link rel="stylesheet" href="../css/bootstrap/dist/bootstrap-datetimepicker.css">
+    <link rel="stylesheet" href="../css/bootstraptable/dist/bootstrap-table.css">
+	<script src="../js/jquery/dist/jquery.js"></script>
+    <script src="../js/bootstrap/bootstrap.js"></script>
+    <script src="../js/bootstraptable/dist/bootstrap-table.js"></script>
+    <script src="../js/bootstrap/bootstrap-datetimepicker.js"></script>
+    <script src="../js/bootstrap/bootstrap-datetimepicker.zh-CN.js"></script>
+</head>
+
+<body>
+
+<nav class="navbar navbar-inverse" role="navigation">
+	<div class="container-fluid">
+    <div class="navbar-header">
+        <a class="navbar-brand" href="#">oj系统</a>
+    </div>
+    <div>
+        <ul class="nav navbar-nav">
+            <li><a href="../html/persondata.html">个人信息</a></li>
+			<li><a href="../html/item.html">题目管理</a></li>
+			<li><a href="../html/exam.html">考试管理</a></li>
+        </ul>
+    </div>
+	</div>
+</nav>
+
+<div id="myButtons1" class="bs-example">
+    <button style="float:right" type="button" class="btn btn-primary">添加</button>
+</div>
+
+<table class="table table-condensed" id="table">
+</table>
+
+<form class="form-horizontal" role="form">
+	<div class="modal fade" id='exam_add_modal' tabindex="-1" role="dialog" aria-labelledby="exam_addModalLabel" aria-hidden="true">
+    <div class="modal-dialog" >
+    <div class="modal-content" >
+        <div class="modal-header">
+                <button type="button" class="close" data-dismiss="modal" aria-hidden="true">
+                &times;
+                </button>
+                <h4 class="modal-title">
+                   增加考试
+                </h4>
+        </div>
+    
+        <div class="modal-body" >
+        <div class="form-group">
+            <!-- label表示文字提示标签,可以通过表单的组建的id提示-->
+            <label class="col-md-2 control-label" for="mid">考试名</label>
+            <div class="col-md-4" >
+                <input class="form-control" type="text"    id='exam_titlename' required/>
+            </div>
+        </div>
+
+        <div class="form-group">
+            <label class="col-md-2 control-label" for="mid">开始时间</label>
+            <div class="col-md-4" >
+                <input type="text" class="form-control" id="datepicker1" required>
+            </div>
+        </div>
+        
+        
+        <div class="form-group">
+            <label class="col-md-2 control-label" for="mid">结束时间</label>
+            <div class="col-md-4" >
+                <input type="text" class="form-control" id="datepicker2" required>
+            </div>
+        </div>
+        
+
+        <div class="form-group">
+            <label class="col-md-2 control-label" >是否向学生公开</label>
+            <div class="col-md-5">
+                <div class="radio-inline" >
+                    <input type="radio" name="select_open"  value=0 checked>是
+                </div>
+
+                <div class="radio-inline">
+                    <input type="radio" name="select_open"  value=1>否
+                </div>
+
+            </div>
+        </div>
+
+        <div class="form-group">
+            <label class="col-md-2 control-label" >选择题目</label>
+            <div class="col-md-5">
+                <a href='javascript:;' class='btn btn-xs green' onclick="add_title()"  title=''><span class='glyphicon glyphicon-plus-sign'></span></a>
+            </div>
+        </div>
+
+        <input type="text" value=""id='IDs'style="visibility:hidden"> 
+        </div>
+        <div class="modal-footer">
+            <button type="button" class="btn btn-default" data-dismiss="modal">关闭</button>
+            <input type="button" class="btn btn-primary"value="提交" id='btn_exam_submit'/>
+        </div>
+    </div><!-- /.modal-content -->
+    </div><!-- /.modal -->
+	</div>
+</form>
+
+<form class="form-horizontal" role="form">
+	<div class="modal fade" id='updateModal' tabindex="-1" role="dialog" aria-labelledby="updateModalLabel" aria-hidden="true">
+    <div class="modal-dialog" >
+    <div class="modal-content" >
+        <div class="modal-header">
+                <button type="button" class="close" data-dismiss="modal" aria-hidden="true">
+                &times;
+                </button>
+                <h4 class="modal-title" id="updateModalLabel">
+                   考试信息修改
+                </h4>
+        </div>
+
+        <div class="modal-body" >
+            <div class="form-group">
+                <!-- label表示文字提示标签,可以通过表单的组建的id提示-->
+                <label class="col-md-2 control-label" for="mid">考试名</label>
+                <div class="col-md-4" >
+                    <input class="form-control" type="text"    id='update_titlename' required/>
+                </div>
+            </div>
+
+            <div class="form-group">
+                <label class="col-md-2 control-label" for="mid">开始时间</label>
+                <div class="col-md-4" >
+                    <input type="text" class="form-control" id="update_datepicker1" required>
+                </div>
+            </div>
+            
+            
+            <div class="form-group">
+                <label class="col-md-2 control-label" for="mid">结束时间</label>
+                <div class="col-md-4" >
+                    <input type="text" class="form-control" id="update_datepicker2" required>
+                </div>
+            </div>
+            
+
+            <div class="form-group">
+                <label class="col-md-2 control-label" >是否向学生公开</label>
+                <div class="col-md-5">
+                    <div class="radio-inline" >
+                        <input type="radio" name="update_open"  value=0 checked>是
+                    </div>
+
+                    <div class="radio-inline">
+                        <input type="radio" name="update_open"  value=1>否
+                    </div>
+
+                </div>
+            </div>
+
+            <div class="form-group">
+                <label class="col-md-2 control-label" >选择题目</label>
+                <div class="col-md-5">
+                    <a href='javascript:;' class='btn btn-xs green' onclick="add_title()"  title=''><span class='glyphicon glyphicon-plus-sign'></span></a>
+                </div>
+            </div>
+        </div>
+
+            <div class="modal-footer">
+                <button type="button" class="btn btn-default" data-dismiss="modal">关闭</button>
+                <input type="button" class="btn btn-primary"value="提交" id='update_submit'/>
+            </div>
+        
+    </div><!-- /.modal-content -->
+    </div><!-- /.modal -->
+	</div>
+</form>
+
+<form class="form-horizontal" role="form">
+	<div class="modal fade" id='exam_select_modal' tabindex="-1" role="dialog" aria-labelledby="updateModalLabel" aria-hidden="true">
+    <div class="modal-dialog" >
+    <div class="modal-content" >
+        <div class="modal-header">
+                <button type="button" class="close" data-dismiss="modal" aria-hidden="true">
+                &times;
+                </button>
+                <h4 class="modal-title">
+                   选择题目
+                </h4>
+        </div>
+
+        <table class="table table-condensed" id="select_table">
+        </table>
+
+        <div class="modal-footer">
+            <button type="button" class="btn btn-default" data-dismiss="modal">关闭</button>
+            <input type="button" class="btn btn-primary"   value="提交" id='btn_titleselect' />
+        </div>
+    </div><!-- /.modal-content -->
+    </div><!-- /.modal -->
+	</div>
+</form>
+
+<script>
+
+$('#btn_exam_submit').click(function(){
+    var data={}
+    data.creator='7f29ac4d-ac7c-418f-925c-88d0d049b58c'
+    data.name=$('#exam_titlename').val()
+    data.start=$('#datepicker1').val()
+    data.end=$('#datepicker2').val()
+    data.pub=$("input[name='select_open']:checked").val();
+    var ids=$('#IDs').val()//从公共id获取考试题目列表
+    alert(ids)
+    data.qids=[]
+    //从ids字符串截取放到数组qids
+    for(i=0;i<ids.length;++i){
+      if(ids.length<37){
+                data.qids.push(ids.substring(0,37))
+                break;
+            }
+        else if(ids[i]==","){
+            data.qids.push(ids.substring(0,i))
+            ids=ids.substring(i+1,ids.length)
+            i=-1
+            if(ids.length<37){
+                data.qids.push(ids.substring(0,37))
+                break;
+            }
+        }
+    }
+    var jsonStr=JSON.stringify(data);
+	console.log(jsonStr)
+    $.ajax({
+							contentType: 'application/json;charset=UTF-8',
+							type: 'put',
+							url:'http://mengxun.online/api/oj/exam/',
+							data: jsonStr,	
+							success:function(res){
+								console.log(res)
+								if(res.code!=40000){
+									alert('提交成功')
+								}
+								else(
+									alert('提交失败')
+								)
+								window.location.reload()
+							},
+							error:function(data){
+								console.log(data.responseJSON)
+								console.log(data.responseText)
+							},
+						})
+
+})
+
+
+$("#myButtons1 .btn").click(function(){
+        $('#exam_add_modal').modal('show')
+});
+
+//点击加载选择考试的题目界面
+function add_title(){
+    $('#exam_select_modal').modal('show')
+    var data={ }
+		data.identity="teacher"
+		data.creator='7f29ac4d-ac7c-418f-925c-88d0d049b58c'
+		var jsonStr=JSON.stringify(data)
+        $('#select_table').bootstrapTable({
+			striped: true,                      //是否显示行间隔色
+              cache: false,                       //是否使用缓存，默认为true，所以一般情况下需要设置一下这个属性（*）
+                 pagination: false,                   //是否显示分页（*）
+                 sortable: true,                     //是否启用排序
+                 sortOrder: "asc",                   //排序方式
+                 sidePagination: "server",           //分页方式：client客户端分页，server服务端分页（*）
+                 pageNumber: 1,                      //初始化加载第一页，默认第一页,并记录
+                 pageSize: 20,                     //每页的记录行数（*）
+                 pageList: [10, 25, 50, 100],        //可供选择的每页的行数（*）
+                 search: false,                      //是否显示表格搜索
+		ajax : function (request) { 
+			$.ajax({
+				
+						contentType: 'application/json;charset=UTF-8',
+						type: 'post',
+						url:'http://mengxun.online/api/oj/question/list',
+						data: jsonStr,	
+						success:function(msg){
+						console.log(msg)
+						request.success({  
+							row : msg  
+						});  
+						var datas=msg.data
+						for(i=0;i<datas.length;++i){
+							datas[i].UpdateAt=datas[i].UpdateAt.substring(0,10)+datas[i].UpdateAt.substring(11,19);
+								switch(datas[i].Diff){
+									case 0:datas[i].Diff='容易' ;break;
+									case 1:datas[i].Diff='中等' ;break;
+									case 2:datas[i].Diff='困难' ;break;
+							   		}
+						}
+						$('#select_table').bootstrapTable('load', datas);  
+						},
+						
+						error:function(data){
+						console.log(data.responseJSON)
+						console.log(data.responseText)
+						},
+					
+		})
+		},
+
+
+		columns: [
+                 {
+					field: 'no',
+					title: '序号',
+					align: 'center',
+					formatter: function (value, row, index) {
+						var pageSize = $('#table').bootstrapTable('getOptions').pageSize;     //通过table的#id 得到每页多少条
+						var pageNumber = $('#table').bootstrapTable('getOptions').pageNumber; //通过table的#id 得到当前第几页
+						return pageSize * (pageNumber - 1) + index + 1;    // 返回每条的序号： 每页条数 *（当前页 - 1 ）+ 序号
+					}
+					},
+					{
+						field: 'Name',
+						title: '题目名'
+					}, 
+					{
+						field: 'Diff',
+						title: '难度'
+					},
+					{
+						field: 'UpdateAt',
+						title: '最后更新时间',
+					
+					},
+                    {
+                        field:'ID',
+                        title:'ID',
+                        visible:false
+
+                    },
+                    {
+                                checkbox: true
+                    },
+                ]
+            })    
+}
+
+//添加题目按钮触发函数
+$("#btn_titleselect").click(function(){
+    var ids = [];
+    var rows = $('#select_table').bootstrapTable('getSelections');
+
+    if (rows.length == 0) {
+        layer.alert("请选择需要的题目");
+        return;
+    } else {
+        $(rows).each(function () {
+            ids.push(this.ID);
+        });}
+    $('#IDs').val(ids)//考试题目列表放到一个公共id上
+})
+
+function ViewById(ID){
+    
+}
+function DeleteByIds(ID){
+      data={}
+      data.creator='7f29ac4d-ac7c-418f-925c-88d0d049b58c'
+      jsonStr=JSON.stringify(data)
+      turl='http://mengxun.online/api/oj/exam/'+ID
+      $.ajax({
+          contentType:'application/json;chaeset=UTF-8',
+          type:'delete',
+          url:turl,
+          data:jsonStr, 
+          success:function(res){
+                if(res.code=='40000'){
+                    alert('删除失败')
+                    window.location.reload()	
+                }
+                else{
+                    alert('删除成功')
+                    window.location.reload()	
+                }
+          }  
+      })
+}
+
+function EditViewById(ID){
+    var data1={}
+    data1.identity="teacher"
+    var jsonStr=JSON.stringify(data1)
+    var turl='http://mengxun.online/api/oj/exam/'+ID+''
+    $.ajax({
+    contentType: 'application/json;charset=UTF-8',
+    type: 'post',
+    url:turl,
+    data:jsonStr,
+    success:function(res){
+        datas=res.data
+        console.log(datas)
+        console.log(datas.Name)
+        datas.Start=datas.Start.substring(0,10)+' '+datas.Start.substring(11,19)
+        datas.End=datas.End.substring(0,10)+' '+datas.End.substring(11,19)
+        $('#update_titlename').val(datas.Name)
+        $('#update_datepicker1').val(datas.Start)
+        $('#update_datepicker2').val(datas.End)
+        $("#input[name='update_open'][value='"+datas.Pub+"']").attr('checked','true');
+        $('#IDs').val(datas.Qids)
+        $('#updateModal').modal('show')
+    },
+	error:function(data){
+	console.log(data.responseJSON)
+	console.log(data.responseText)
+	},
+    })
+
+    $('#update_submit').bind('click',function(){
+        var data={}
+        data.creator='7f29ac4d-ac7c-418f-925c-88d0d049b58c'
+        data.name=$('#update_titlename').val()
+        data.start=$('#update_datepicker1').val()
+        data.end=$('#update_datepicker2').val()
+        data.pub=$("input[name='update_open']:checked").val();
+        var ids=$('#IDs').val()//从公共id获取考试题目列表
+        data.qids=[]
+        for(i=0;i<data.start.length;++i){
+            if(data.start[i]=="-"){
+                data.start[i]=="/"
+            }
+        }
+        for(i=0;i<data.end.length;++i){
+            if(data.end[i]=="-"){
+                data.end[i]=="/"
+            }
+        }
+        //从ids字符串截取放到数组qids
+        for(i=0;i<ids.length;++i){
+        if(ids.length<37){
+                    data.qids.push(ids.substring(0,37))
+                    break;
+                }
+            else if(ids[i]==","){
+                data.qids.push(ids.substring(0,i))
+                ids=ids.substring(i+1,ids.length)
+                i=-1
+                if(ids.length<37){
+                    data.qids.push(ids.substring(0,37))
+                    break;
+                }
+            }
+        }
+        var jsonStr=JSON.stringify(data);
+        console.log(jsonStr)
+        turl='http://mengxun.online/api/oj/exam/'+ID+
+        $.ajax({
+							contentType: 'application/json;charset=UTF-8',
+							type: 'patch',
+							url:turl,
+							data: jsonStr,	
+							success:function(res){
+								console.log(res)
+								if(res.code!=40000){
+									alert('修改成功')
+								}
+								else(
+									alert('修改失败')
+								)
+								window.location.reload()
+							},
+							error:function(data){
+								console.log(data.responseJSON)
+								console.log(data.responseText)
+							},
+						})
+
+    })
+
+}
+
+
+$(function () {
+    $("#datepicker1").datetimepicker
+      ({
+          autoclose: true,
+          todayHighlight: true,
+          /*汉化*/
+          language: "zh-CN",
+          /*日期格式*/
+          format:"yyyy-mm-dd hh:ii"       
+        });
+
+      
+    
+        $("#datepicker2").datetimepicker
+      ({
+          autoclose: true,
+          todayHighlight: true,
+          /*汉化*/
+          language: "zh-CN",
+          /*日期格式*/
+          format:"yyyy-mm-dd hh:ii"       
+        });
+
+
+        var data={ }
+		data.identity="teacher"
+		data.cid='7f29ac4d-ac7c-418f-925c-88d0d049b58c'
+		var jsonStr=JSON.stringify(data)
+		function actionFormatter(value, row, index) {
+             var id = value;
+             var result = "";
+             result += "<a href='examview.html?id="+id+"' class='btn btn-xs green' onclick=\"ViewById('" + id + "', view='view')\" title='查看'><span class='glyphicon glyphicon-search'></span></a>";
+             result += "<a href='javascript:;' class='btn btn-xs blue' onclick=\"EditViewById('" + id + "')\" title='编辑'><span class='glyphicon glyphicon-pencil'></span></a>";
+             result += "<a href='javascript:;' class='btn btn-xs red' onclick=\"DeleteByIds('" + id + "')\" title='删除'><span class='glyphicon glyphicon-remove'></span></a>";
+             return result;
+         }
+
+	
+
+		
+		$('#table').bootstrapTable({
+			striped: true,                      //是否显示行间隔色
+              cache: false,                       //是否使用缓存，默认为true，所以一般情况下需要设置一下这个属性（*）
+                 pagination: false,                   //是否显示分页（*）
+                 sortable: true,                     //是否启用排序
+                 sortOrder: "asc",                   //排序方式
+                 sidePagination: "server",           //分页方式：client客户端分页，server服务端分页（*）
+                 pageNumber: 1,                      //初始化加载第一页，默认第一页,并记录
+                 pageSize: 20,                     //每页的记录行数（*）
+                 pageList: [10, 25, 50, 100],        //可供选择的每页的行数（*）
+                 search: false,                      //是否显示表格搜索
+		ajax : function (request) {
+            var datas1=[]
+            var i=0;
+			$.ajax({
+				
+						contentType: 'application/json;charset=UTF-8',
+						type: 'post',
+						url:'http://mengxun.online/api/oj/exam/list',
+						data: jsonStr,	
+						success:function(msg){
+						console.log(msg)
+						request.success({  
+							row : msg  
+						});  
+						var datas=msg.data
+                        publish=datas.Publish
+                        for(s=0;s<publish.length;++s){
+                            var data1={}
+                            data1.identity="teacher"
+                            var jsonStr=JSON.stringify(data1)
+                            var turl='http://mengxun.online/api/oj/exam/'+publish[s]+''
+                            $.ajax({
+                            contentType: 'application/json;charset=UTF-8',
+							type: 'post',
+							url:turl,
+							data:jsonStr,
+							success:function(res){
+								var viewdata=res.data
+                                viewdata.UpdateAt=viewdata.UpdateAt.substring(0,10)+" "+viewdata.UpdateAt.substring(11,19)
+                                viewdata.Start=viewdata.Start.substring(0,10)+" "+viewdata.Start.substring(11,19)
+                                viewdata.End=viewdata.End.substring(0,10)+" "+viewdata.End.substring(11,19)
+                                switch(viewdata.Pub){
+									case 0:viewdata.Pub='是' ;break;
+									case 1:viewdata.Pub='否' ;break;
+							   		}
+                                 if(i<s){
+                                     datas1[i]=viewdata
+                                     i++
+                                 }
+                                 if(i==s){
+                                    console.log(datas1)
+                                    $('#table').bootstrapTable('load', datas1);  
+                                 }
+                                
+
+							},
+							error:function(data){
+								console.log(data.responseJSON)
+								console.log(data.responseText)
+							},
+                            })
+                        }
+                    },
+                    error:function(data){
+								console.log(data.responseJSON)
+								console.log(data.responseText)
+							},					
+			})
+		},
+      
+
+		columns: [
+                    {
+					field: 'Number',
+					title: '序号',
+					align: 'center',
+					formatter: function (value, row, index) {
+						var pageSize = $('#table').bootstrapTable('getOptions').pageSize;     //通过table的#id 得到每页多少条
+						var pageNumber = $('#table').bootstrapTable('getOptions').pageNumber; //通过table的#id 得到当前第几页
+						return pageSize * (pageNumber - 1) + index + 1;    // 返回每条的序号： 每页条数 *（当前页 - 1 ）+ 序号
+					}
+					},
+					{
+						field: 'Name',
+						title: '考试名'
+					}, 
+					{
+						field: 'Pub',
+						title: '题目是否向学生公开'
+					},
+					{
+						field: 'UpdateAt',
+						title: '最后更新时间',
+					
+					},
+					
+					{
+						field:'Start',
+						title:'开始时间',
+					},
+                    {
+                        field:'End',
+                        title:'结束时间',
+                    },
+                    {
+						field:'ID',
+						title: '操作',
+						width: 120,
+						align: 'center',
+						valign: 'middle',
+						formatter: actionFormatter
+					} ,
+				],
+		})
+
+});
+
+</script>
+</body>
