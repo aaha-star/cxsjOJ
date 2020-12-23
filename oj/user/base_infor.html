@@ -1,0 +1,112 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+    <title>个人中心</title>
+    <meta http-equiv="Content-Type" content="text/html;charset=UTF-8">
+    <script src="../script/jquery.js"></script>
+    <style>
+        div.in,
+        div.out {
+            display: flex;
+            align-items: center;
+            margin-left: 50px;
+            margin-top: 20px;
+        }
+        
+        input {
+            width: 200px;
+            outline: none;
+        }
+        
+        #box {
+            border-top: black;
+            border-top-style: dotted;
+        }
+        
+        .tin {
+            font-size: 1.5em;
+        }
+        
+        .ti {
+            font-size: 1.5em;
+        }
+        
+        .id {
+            width: 150px;
+            color: cornflowerblue;
+        }
+    </style>
+</head>
+
+<body>
+    <h1>个人信息</h1>
+    <div id="box"></div>
+    <button id="change">修改</button>
+</body>
+
+<script>
+    function getQueryVariable(variable) {
+        var query = window.location.search.substring(1);
+        var vars = query.split("&");
+        for (var i = 0; i < vars.length; i++) {
+            var pair = vars[i].split("=");
+            if (pair[0] == variable) {
+                return pair[1];
+            }
+        }
+        return (false);
+    }
+    let _type = getQueryVariable("type");
+    var uid = getQueryVariable("id");
+
+    function getdata() {
+        $.get("http://mengxun.online/api/oj/" + _type + "/" + uid, function(result) {
+            let data = result.data;
+            console.log(result);
+            for (var key in data) {
+                if (key == "Email" || key == "Name" || key == "Age" || key == "Sex") {
+                    data[key] = data[key] === null ? "" : data[key];
+                    let str = "<div class='in'><p class='id'>" + key + "</p><input class='tin' type='text' value=" + data[key] + "></div>"
+                    $("#box").append($(str));
+                } else {
+                    data[key] = data[key] === null ? "密" : data[key];
+                    let str = "<div class='out'><p class='id'>" + key + "</p><p class='ti'>" + data[key] + "<p></div>"
+                    $("#box").append($(str));
+                }
+            }
+
+            let str = "<div class='in'><p class='id'> password</p><input class='tin' type='text'></div>"
+            $("#box").append($(str));
+            document.getElementById("change").onclick = function() {
+                let change = {};
+                if (document.getElementById("Email").value && data.Email != document.getElementById("Email").value) {
+                    change.email = document.getElementById("Email").value;
+                }
+                if (data.Name && data.Name != document.getElementById("Name").value) {
+                    change.name = document.getElementById("Name").value;
+                }
+                if (document.getElementById("mm").value) {
+                    change.password = document.getElementById("mm").value;
+                }
+
+                if (Object.keys(change).length > 0) {
+                    $.ajax({
+                        type: "PATCH",
+                        url: "http://mengxun.online/api/oj/" + _type + "/" + uid,
+                        contentType: "application/json",
+                        data: JSON.stringify(change),
+                        dataType: "json",
+                        success: function(res) {
+                            confirm(res.msg);
+                        }
+                    });
+                }
+            }
+
+        });
+    };
+    getdata();
+</script>
+
+</html>

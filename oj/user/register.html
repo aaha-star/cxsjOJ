@@ -1,0 +1,99 @@
+<!DOCTYPE html>
+<html lang="zh">
+
+<head>
+    <title>注册</title>
+    <meta http-equiv="Content-Type" content="text/html;charset=UTF-8">
+    <script src="../script/jquery.js"></script>
+</head>
+
+<body>
+    <div>
+        <h1>用户注册</h1>
+    </div>
+    <div>
+        <div>
+            <div>
+                用户名 ：<input type="text" maxlength="6" minlength="2" id="n1">
+            </div>
+            <div>
+                密码 ：<input type="text" maxlength="20" minlength="6" id="m1">
+            </div>
+            <div>
+                确认密码：<input type="text" maxlength="20" minlength="6" id="m2">
+            </div>
+            <div>
+                性别 ：<input type="radio" name="sex" value="nan" checked>男
+                <input type="radio" value="nv" name="sex">女
+            </div>
+            <div>
+                年龄 ：<input type="number">*可为空 <br> 邮箱 ：<input type="text">
+            </div>
+            <div>
+                <button id="jszc">教师注册</button>
+                <button id="xszc">学生注册</button>
+            </div>
+        </div>
+    </div>
+
+</body>
+<script>
+    $("#xszc").click(function(event) {
+        event.preventDefault();
+        let name = $("#n1").val();
+        let ps1 = $("#m1").val();
+        let ps2 = $("#m2").val();
+        if (name.length >= 3 && ps1 === ps2 && name.length <= 6) {
+            $.ajax({
+                type: "PUT",
+                url: "http://mengxun.online/api/oj/student/",
+                contentType: "application/json",
+                data: JSON.stringify({
+                    name: name,
+                    password: ps2
+                }),
+                dataType: "json",
+                success: function(res) {
+                    // if(res.code==0)
+                    {
+                        if (confirm(res.msg + "\n" + "点击确认跳转到登录界面")) {
+                            window.location.href = "login.html"
+
+                        }
+                    }
+                    console.log(res);
+                }
+            })
+        }
+    })
+    $("#jszc").click(function(event) {
+        event.preventDefault();
+        let name = $("#n1").val();
+        let ps1 = $("#m1").val();
+        let ps2 = $("#m2").val();
+
+        if (name.length >= 3 && ps1 === ps2 && name.length <= 6) {
+            $.ajax({
+                type: "PUT",
+                url: "http://mengxun.online/api/oj/teacher/",
+                contentType: "application/json",
+                data: JSON.stringify({
+                    name: name,
+                    password: ps2
+                }),
+                dataType: "json",
+                success: function(res) {
+                    {
+                        if (confirm(res.msg + "\n" + "点击确认跳转到登录界面")) {
+                            window.location.href = "login.html"
+
+                        }
+                    }
+                    console.log(res);
+                }
+            })
+        }
+    });
+</script>
+
+</html>
