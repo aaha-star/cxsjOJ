@@ -1,0 +1,93 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+    <meta charset="utf-8">
+    <title>题目</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <style>
+        #problemContent {
+            margin: 50px;
+        }
+    </style>
+    <link rel="stylesheet" href="../style/bootstrap.min.css">
+    <script src="../script/ace.js" type="text/javascript" charset="utf-8"></script>
+    <script src="../script/ext-language_tools.js" type="text/javascript" charset="utf-8"></script>
+    <script src="../script/jquery.js"></script>
+</head>
+
+<body>
+    <div id="problemContent" ng-controller="problemCtr">
+        <div class="panel panel-primary">
+            <div class="panel-heading">题目搜索</div>
+            <div class="panel-body">
+                <table class="table">
+                    <tr>
+                        <td>题目编号：<input class="input" type="number" ng-model="searchId">
+                            <button class="btn btn-success" type="button" ng-click="searchById()">搜索</button>
+                        </td>
+                    </tr>
+                </table>
+            </div>
+        </div>
+
+        <div class="panel panel-primary">
+            <div class="panel-heading">题目信息</div>
+            <div class="panel-body">
+                <table class="table table-striped">
+                    <thead>
+                        <tr>
+                            <th class="col-md-1">编号</th>
+                            <th class="col-md-2">题目名称</th>
+                            <th class="col-md-1">题目难度</th>
+                            <th class="col-md-1">题目详情</th>
+                        </tr>
+                    </thead>
+
+                    <tbody id="questions"></tbody>
+                </table>
+            </div>
+            <ul class="pager">
+                <li><a href="javascript:;" ng-if="isCanPre" ng-click="changePage(false)">&laquo;上一页</a></li>
+                </span>
+                </li>
+                <li><a href="javascript:;" ng-if="isCanNext" ng-click="changePage(true)">下一页&raquo;</a></li>
+            </ul>
+        </div>
+    </div>
+    <script>
+        function getQueryVariable(variable) {
+            var query = window.location.search.substring(1);
+            var vars = query.split("&");
+            for (var i = 0; i < vars.length; i++) {
+                var pair = vars[i].split("=");
+                if (pair[0] == variable) {
+                    return pair[1];
+                }
+            }
+            return (false);
+        }
+        $.ajax({
+            type: "POST",
+            url: "http://mengxun.online/api/oj/question/list",
+            contentType: "application/json",
+            data: JSON.stringify({
+                identity: "student"
+            }),
+            dataType: "json",
+            success: function(res) {
+                let data = res.data;
+                data.forEach((one, ind) => {
+                    let line = "<tr><td class='col-md-1'>" + (ind + 1) + "</td><td class='col-md-2'>" + one.Name + "</td>";
+                    line += "<td class='col-md-1'>" + one.Diff + "</td><td class='col-md-1'><button rel='" + one.ID + "'>查看</button></td></tr>";
+                    $("#questions").append($(line));
+                });
+                $("#questions button").click(function() {
+                    window.location.href = "detail.html?qid=" + $(this).attr("rel") + "&uid=" + getQueryVariable("uid");
+                });
+                console.log(res);
+            }
+        });
+    </script>
+</body>
+<html>

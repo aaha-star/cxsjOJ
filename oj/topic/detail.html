@@ -1,0 +1,344 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+    <meta charset="utf-8">
+    <title>题目详情</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@3.3.7/dist/css/bootstrap.min.css"
+        integrity="sha384-BVYiiSIFeK1dGmJRAkycuHAHRg32OmUcww7on3RYdg4Va+PmSTsz/K68vbdEjh4u" crossorigin="anonymous">
+    <script src="../script/jquery.js"></script>
+    <script src="https://pagecdn.io/lib/ace/1.4.12/ace.js" crossorigin="anonymous"
+        integrity="sha256-Q9hnBpgBFstzZOr+OKFOWZWfcF5nFXO8Qz48Nmndo6U="></script>
+    <script src="https://pagecdn.io/lib/ace/1.4.12/ext-language_tools.min.js" crossorigin="anonymous"></script>
+    <style>
+        html,
+        body {
+            width: 100%;
+            height: 100%;
+            padding: 0;
+            margin: 0;
+        }
+
+        body {
+            min-height: 300px;
+            background: #f6f6f6;
+            padding-top: 20px;
+        }
+
+        div.col-md-4,
+        div.container {
+            width: 100%;
+        }
+
+        #userContent {
+            margin: 0px;
+        }
+
+        p {
+            word-break: break-all;
+            display: inline-block;
+        }
+
+        #detailDialog {
+            margin: 0;
+            width: 100%;
+        }
+
+        #userContent .modal-dialog {
+            width: 100%;
+        }
+
+        #userContent textarea {
+            width: 100%;
+        }
+
+        #userContentCode {
+            margin-top: 10px;
+            margin-bottom: 10px;
+            border: 1px solid black;
+            padding: 10px;
+            max-height: 450px;
+            overflow: scroll;
+        }
+
+        .container {
+            width: 95%;
+            padding-right: 15px;
+            padding-left: 15px;
+            margin-right: auto;
+            margin-left: auto;
+        }
+
+        #runRes {
+            min-height: 400px;
+            box-sizing: border-box;
+            padding: 10px;
+        }
+
+        #runRes>p {
+            display: block;
+        }
+    </style>
+</head>
+
+<body>
+    <div class="col-md-4">
+        <div class="panel panel-info">
+            <div class="panel-heading">题目详情</div>
+            <div class="panel-body" id="detail"></div>
+        </div>
+
+        <div class="container">
+            <div class="row">
+                <div class="col-sm-6">
+                    <div class="panel panel-default">
+                        <div class="panel-heading">
+                            <form class="form-inline">
+                                <div class="row">
+                                    <div class="col-xs-6">
+                                    </div>
+                                    <div class="col-xs-6 text-right">
+                                        <button type="button" class="btn btn-success" id="codeRun">
+                                            <span class="glyphicon glyphicon-send"></span>点击运行
+                                        </button>
+                                    </div>
+                                </div>
+                            </form>
+                        </div>
+                        <div class="panel-body">
+                            <pre id="code" class="ace_editor"
+                                style="min-height:400px"><textarea class="ace_text-input"></textarea></pre>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="col-sm-6">
+                    <div class="panel panel-default">
+                        <div class="panel-heading">
+                            <form class="form-inline">
+                                <button type="button" class="btn btn-default">运行结果</button>
+                            </form>
+                        </div>
+                        <div class="panel-body">
+                            <div id="runRes">
+                                <p>状态：<b id="runSta">NULL</b></p>
+                                <p>信息：<b id="runMsg">代码待运行</b></p>
+                                <p>时间：<b id="runTime"></b></p>
+                                <p>运行内存：<b id="runMemory"></b></p>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+            </div>
+
+        </div>
+    </div>
+    <script>
+        const Base64 = {
+            // private property
+            _keyStr: "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789+/=",
+            // public method for encoding
+            encode: function (input) {
+                var output = "";
+                var chr1, chr2, chr3, enc1, enc2, enc3, enc4;
+                var i = 0;
+                input = Base64._utf8_encode(input);
+                while (i < input.length) {
+                    chr1 = input.charCodeAt(i++);
+                    chr2 = input.charCodeAt(i++);
+                    chr3 = input.charCodeAt(i++);
+                    enc1 = chr1 >> 2;
+                    enc2 = ((chr1 & 3) << 4) | (chr2 >> 4);
+                    enc3 = ((chr2 & 15) << 2) | (chr3 >> 6);
+                    enc4 = chr3 & 63;
+                    if (isNaN(chr2)) {
+                        enc3 = enc4 = 64;
+                    } else if (isNaN(chr3)) {
+                        enc4 = 64;
+                    }
+                    output = output + this._keyStr.charAt(enc1) + this._keyStr.charAt(enc2) + this._keyStr.charAt(enc3) + this._keyStr.charAt(enc4);
+                }
+                return output;
+            },
+            // public method for decoding
+            decode: function (input) {
+                var output = "";
+                var chr1, chr2, chr3;
+                var enc1, enc2, enc3, enc4;
+                var i = 0;
+                input = input.replace(/[^A-Za-z0-9\+\/\=]/g, "");
+                while (i < input.length) {
+                    enc1 = this._keyStr.indexOf(input.charAt(i++));
+                    enc2 = this._keyStr.indexOf(input.charAt(i++));
+                    enc3 = this._keyStr.indexOf(input.charAt(i++));
+                    enc4 = this._keyStr.indexOf(input.charAt(i++));
+                    chr1 = (enc1 << 2) | (enc2 >> 4);
+                    chr2 = ((enc2 & 15) << 4) | (enc3 >> 2);
+                    chr3 = ((enc3 & 3) << 6) | enc4;
+                    output = output + String.fromCharCode(chr1);
+                    if (enc3 != 64) {
+                        output = output + String.fromCharCode(chr2);
+                    }
+                    if (enc4 != 64) {
+                        output = output + String.fromCharCode(chr3);
+                    }
+                }
+                output = Base64._utf8_decode(output);
+                return output;
+            },
+            // private method for UTF-8 encoding
+            _utf8_encode: function (string) {
+                string = string.replace(/\r\n/g, "\n");
+                var utftext = "";
+                for (var n = 0; n < string.length; n++) {
+                    var c = string.charCodeAt(n);
+                    if (c < 128) {
+                        utftext += String.fromCharCode(c);
+                    } else if ((c > 127) && (c < 2048)) {
+                        utftext += String.fromCharCode((c >> 6) | 192);
+                        utftext += String.fromCharCode((c & 63) | 128);
+                    } else {
+                        utftext += String.fromCharCode((c >> 12) | 224);
+                        utftext += String.fromCharCode(((c >> 6) & 63) | 128);
+                        utftext += String.fromCharCode((c & 63) | 128);
+                    }
+                }
+                return utftext;
+            },
+            // private method for UTF-8 decoding
+            _utf8_decode: function (utftext) {
+                var string = "";
+                var i = 0;
+                var c = c1 = c2 = 0;
+                while (i < utftext.length) {
+                    c = utftext.charCodeAt(i);
+                    if (c < 128) {
+                        string += String.fromCharCode(c);
+                        i++;
+                    } else if ((c > 191) && (c < 224)) {
+                        c2 = utftext.charCodeAt(i + 1);
+                        string += String.fromCharCode(((c & 31) << 6) | (c2 & 63));
+                        i += 2;
+                    } else {
+                        c2 = utftext.charCodeAt(i + 1);
+                        c3 = utftext.charCodeAt(i + 2);
+                        string += String.fromCharCode(((c & 15) << 12) | ((c2 & 63) << 6) | (c3 & 63));
+                        i += 3;
+                    }
+
+                }
+                return string;
+            }
+        }
+
+        function pageInit() {
+            editor = ace.edit("code");  //初始化对象
+            editor.setTheme("ace/theme/" + "clouds");  //设置风格
+            editor.session.setMode("ace/mode/" + "c_cpp");   //设置语言
+            editor.setFontSize(18);  //字体大小
+            editor.setReadOnly(false);  //设置只读（true时只读，用于展示代码）
+            editor.setOption("wrap", "free");  //自动换行,设置为off关闭
+            //启用提示菜单
+            ace.require("ace/ext/language_tools");
+            editor.setOptions({
+                enableBasicAutocompletion: true,
+                enableSnippets: true,
+                enableLiveAutocompletion: true
+            });
+
+            // 获取题目信息
+            $.ajax({
+                type: "POST",
+                url: "http://mengxun.online/api/oj/question/" + getQueryVariable("qid"),
+                contentType: "application/json",
+                data: JSON.stringify({
+                    identity: "student",
+                    codetype: "json"
+                }),
+                dataType: "json",
+                success: function (res) {
+                    console.log(res);
+                    $("#detail").text(res.data.Detail);
+                }
+            });
+        }
+
+        function getQueryVariable(variable) {
+            var query = window.location.search.substring(1);
+            var vars = query.split("&");
+            for (var i = 0; i < vars.length; i++) {
+                var pair = vars[i].split("=");
+                if (pair[0] == variable) {
+                    return pair[1];
+                }
+            }
+            return (false);
+        }
+
+        pageInit();
+        $("#codeRun").click(function () {
+            let code = $("#code div.ace_content")[0].innerText;
+            if (code) {
+                $("#runSta").text("代码运行中").css("color", "gray");
+                $("#runTime").text("耗时：").css("color", "gray");
+                $("#runMsg").text("运行状态").css("color", "gray");
+                $("#runMemory").text("").css("color", "gray");
+
+                // let count = 1;
+                // let timmer = setInterval(function () {
+                //      $("#runTime").text("耗时：" + count++ + " s");
+                //  }, 1000);
+
+                //  $.ajax({
+                //     type: "PUT",
+                //     url: " http://mengxun.online/api/oj/code/" + getQueryVariable("sid"),              
+                //     contentType: "application/json",
+                //     data: JSON.stringify({
+                //         qid: getQueryVariable("qid"),
+                //         code: Base64.encode(code),
+                //         codetype: "c"
+                //     }),
+                //     dataType: "json",
+                //     success: function (res) {
+                //         clearInterval(timmer);
+                //         console.log(res);
+                //         let color = res.data === "Accepted" ? "green" : "red";
+                //         $("#runTime").text(res.time).css("color", color);
+                //         $("#runMemory").text(res.memory).css("color", color);
+                //     },
+                //     fail: function (err) {
+                //         console.log(err);
+                //     }
+                // });
+        
+                $.ajax({
+                    type: "POST",
+                    url: "http://mengxun.online/api/oj/run/" + getQueryVariable("qid"),              
+                    contentType: "application/json",
+                    data: JSON.stringify({
+                        uid: getQueryVariable("uid"),
+                        code: Base64.encode(code),
+                        codetype: "c"
+                    }),
+                    dataType: "json",
+                    success: function (res) {
+                        // clearInterval(timmer);
+                        console.log(res);
+                        let color = res.data.Status === "Accepted" ? "green" : "red";
+                        $("#runSta").text(res.data.Status).css("color", color);
+                        $("#runMsg").text(res.msg).css("color", color);
+                        $("#runTime").text("耗时："+res.data.Time + "ms").css("color", color);
+                        $("#runMemory").text(res.data.Memory).css("color", color);
+                    },
+                    fail: function (err) {
+                        console.log(err);
+                    }
+                });
+            }
+        });
+    </script>
+</body>
+
+</html>

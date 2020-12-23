@@ -1,0 +1,90 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+    <title>登录/注册</title>
+    <script src="../script/jquery.js"></script>
+    <style>
+        body {
+            background-image: url(../img/3.jfif);
+            background-size: cover;
+            background-repeat: no-repeat;
+            background-position: center -100px;
+            background-attachment: fixed;
+        }
+        body>div{
+            color: white;
+        }
+        
+        #box {
+            margin: 0 auto;
+        }
+    </style>
+</head>
+
+<body>
+    <div class="me">
+        <div class="biaoti">
+            <h1>登录</h1>
+        </div class="biaoge">
+
+        <div class="yonghu">
+            账号：<input type="text" id="m1" />
+        </div>
+
+        <div class="mima">
+            密码：<input type="password" id="m2" />
+        </div>
+
+        <div class="anniu">
+            <input type="submit" onclick="dl()" value="老师登录" />
+            <input type="submit" onclick="sl()" value="学生登录" />
+            <input type="submit" onclick="zc()" value="注册" />
+        </div>
+        <a href="forget.html">忘记密码?</a>
+    </div>
+    <script>
+        function zc() {
+            window.location.href = "register.html";
+        }
+
+        function dl() {
+            alert("我们不做教师端！");
+            // $.ajax({
+            //     type: "POST",
+            //     url: "http://mengxun.online/api/oj/teacher/",
+            //     contentType: 'application/json',
+            //     data: JSON.stringify({
+            //         name: $("#m1").val(),
+            //         password: $("#m2").val()
+            //     }),
+            //     success: function(res) {
+            //         if (res.code == 0) {
+            //             let s = "../topic/index.html" + "?" + "id=" + res.data.ID;
+            //             window.location.href = s;
+            //         } else alert(res.msg);
+            //     }
+            // });
+        }
+
+        function sl() {
+            $.ajax({
+                type: "post",
+                url: "http://mengxun.online/api/oj/student/",
+                contentType: "application/json",
+                data: JSON.stringify({
+                    name: $("#m1").val(),
+                    password: $("#m2").val()
+                }),
+                success: function(res) {
+                    if (res.code == 0) {
+                        let s = "../topic/index.html" + "?" + "id=" + res.data.ID;
+                        window.location.href = s;
+                    } else alert(res.msg);
+                }
+            })
+        }
+    </script>
+</body>
+
+</html>
