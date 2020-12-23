@@ -1,0 +1,207 @@
+<!doctype html>
+<html lang="zh">
+
+<head>
+    <meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
+    <script src="../script/echarts.js"></script>
+
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link rel="stylesheet" href="../style/bootstrap.min.css">
+
+    <title>一个OJ</title>
+    <link rel="SHORTCUT ICON" href="../img/logo.jpg">
+    <link rel="stylesheet" type="text/css" href="../style/font-awesome.min.css" />
+    <link rel="stylesheet" type="text/css" href="../style/responsive.css" />
+    <link rel="stylesheet" type="text/css" href="../style/animate.min.css" />
+    <link rel="stylesheet" type="text/css" href="../style/main.css" />
+    <script src="../script/angular.min.js"></script>
+    <script src="../script/angular-route.min.js"></script>
+    <script src="../script/controllers.js"></script>
+    <script src="../script/jquery.js"></script>
+    <script src="../script/bootstrap.min.js"></script>
+</head>
+
+<body ng-controller="indexCtr">
+    <header id="header">
+        <nav class="navbar navbar-inverse" role="banner">
+            <div class="container">
+                <div class="navbar-header">
+                    <button type="button" class="navbar-toggle" data-toggle="collapse" data-target=".navbar-collapse">
+                        <span class="sr-only"></span> <span class="icon-bar"></span> <span class="icon-bar"></span>
+                        <span class="icon-bar"></span>
+                    </button>
+                    <a class="navbar-brand" href="javascript:;">
+                        <p>一个OJ</p>
+                    </a>
+                </div>
+
+                <div class="collapse navbar-collapse navbar-right">
+                    <ul class="nav navbar-nav">
+                        <li><a href="../user/login.html">退出登录</a></li>
+                        <li><a href="javascript:;" class="redirect" rel="questions">题目</a></li>
+                        <li><a href="javascript:;" class="redirect" rel="exams">考试</a></li>
+                        <li><a href="javascript:;" id="toInfor">个人信息</a></li>
+                    </ul>
+                    <label ng-if="userData == null">
+                    </label>
+                </div>
+            </div>
+        </nav>
+    </header>
+
+    <!-- 为ECharts准备一个具备大小（宽高）的Dom -->
+    <div id="main" style="width: 600px;height:300px; margin:40px;position:absolute;left:150px; top:80px"></div>
+    <script type="text/javascript">
+        var myChart = echarts.init(document.getElementById('main'));
+
+        var option = {
+            title: {
+                text: '做题统计示例1  个人答题数'
+            },
+            tooltip: {},
+            legend: {
+                data: ['做题数']
+            },
+            xAxis: {
+                data: ["难度0", "难度1", "难度2"]
+            },
+            yAxis: {},
+            series: [{
+                name: '做题数',
+                type: 'bar',
+                data: [15, 10, 20]
+            }]
+        };
+
+        myChart.setOption(option);
+    </script>
+
+    <div id="main1" style="width: 600px;height:300px; margin: 40px;position:absolute;left:750px; top:80px;"></div>
+    <script type="text/javascript">
+        function getQueryVariable(variable) {
+            var query = window.location.search.substring(1);
+            var vars = query.split("&");
+            for (var i = 0; i < vars.length; i++) {
+                var pair = vars[i].split("=");
+                if (pair[0] == variable) {
+                    return pair[1];
+                }
+            }
+            return (false);
+        }
+
+        $("#header .nav li").click(function() {
+            $("#header .nav li").removeClass("active");
+            $(this).addClass("active");
+        });
+
+        $("#toInfor").click(function() {
+            let uid = getQueryVariable("id");
+            window.location.href = "../user/infor.html?type=teacher&id=" + uid;
+        });
+
+        $(".redirect").click(function() {
+            let to = $(this).attr("rel");
+            window.location.href = to + ".html?uid=" + getQueryVariable("id");
+        });
+
+        function check() {
+            var allLi = $("#header .nav li");
+            var path = window.location.hash;
+            if (path == "") {
+                $(allLi[0]).addClass("active");
+                return;
+            }
+            for (var n = 0; n < allLi.length; n++) {
+                if ($(allLi[n]).html().indexOf(path) > -1) {
+                    $(allLi[n]).addClass("active");
+                }
+            }
+        }
+
+        check();
+
+        var myChart = echarts.init(document.getElementById('main1'));
+
+        var option = {
+            title: {
+                text: '做题统计示例2  个人答题数'
+            },
+            tooltip: {},
+            legend: {
+                data: ['做题数']
+            },
+            xAxis: {
+                data: ["周一", "周二", "周三", "周四", "周五", "周六", "周日"]
+            },
+            yAxis: {},
+            series: [{
+                name: '做题数',
+                type: 'line',
+                data: [7, 2, 8, 10, 3, 5, 10]
+            }]
+        };
+
+        myChart.setOption(option);
+    </script>
+
+<div id="main2" style="width: 600px;height:300px; margin:40px;position:absolute;left:760px; top:350px"></div>
+<script type="text/javascript">
+    // 基于准备好的dom，初始化echarts实例
+    var myChart = echarts.init(document.getElementById('main2'));
+
+    // 指定图表的配置项和数据
+    var option = {
+        title: {
+                text: '做题统计示例4  答题总数'
+            },
+            series : [
+                {
+                    name: '访问来源',
+                    type: 'pie',
+                    radius: '75%',
+                    roseType: 'angle',
+                    data:[
+                        {value:235, name:'周一'},
+                        {value:274, name:'周二'},
+                        {value:310, name:'周三'},
+                        {value:335, name:'周四'},
+                        {value:400, name:'周五'},
+                        {value:366, name:'周六'},
+                        {value:198, name:'周日'}
+                    ]
+                }
+            ]
+        };
+
+    // 使用刚指定的配置项和数据显示图表。
+    myChart.setOption(option);
+</script>
+
+<div id="main3" style="width: 600px;height:300px; margin:40px;position:absolute;left:160px; top:350px"></div>
+<script type="text/javascript">
+    // 基于准备好的dom，初始化echarts实例
+    var myChart = echarts.init(document.getElementById('main3'));
+
+    myChart.setOption({
+        title: {
+                text: '做题统计示例3  答题总数'
+            },
+        series : [
+            {
+                name: '访问来源',
+                type: 'pie',    // 设置图表类型为饼图
+                radius: '60%',  // 饼图的半径，外半径为可视区尺寸（容器高宽中较小一项）的 55% 长度。
+                data:[          // 数据数组，name 为数据项名称，value 为数据项值
+                    {value:635, name:'难度0'},
+                    {value:574, name:'难度1'},
+                    {value:710, name:'难度2'}
+                ]
+            }
+        ]
+    })
+</script>
+
+</body>
+
+</html>

@@ -1,0 +1,119 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+    <meta charset="utf-8">
+    <title>考试</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <style>
+        #problemContent {
+            margin: 50px;
+        }
+    </style>
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@3.3.7/dist/css/bootstrap.min.css"
+        integrity="sha384-BVYiiSIFeK1dGmJRAkycuHAHRg32OmUcww7on3RYdg4Va+PmSTsz/K68vbdEjh4u" crossorigin="anonymous">
+    <script src="../script/jquery.js"></script>
+    <script src="https://pagecdn.io/lib/ace/1.4.12/ace.js" crossorigin="anonymous"
+        integrity="sha256-Q9hnBpgBFstzZOr+OKFOWZWfcF5nFXO8Qz48Nmndo6U="></script>
+    <script src="https://pagecdn.io/lib/ace/1.4.12/ext-language_tools.min.js" crossorigin="anonymous"></script>
+</head>
+
+<body>
+    <div id="problemContent" ng-controller="problemCtr">
+        <div class="panel panel-primary">
+            <div class="panel-heading">考试信息</div>
+            <div class="panel-body">
+                <table class="table table-striped">
+                    <thead>
+                        <tr>
+                            <th class="col-md-1">考试名称</th>
+                            <th class="col-md-1">考试状态</th>
+                            <th class="col-md-1">开始时间</th>
+                            <th class="col-md-1">结束时间</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <tr>
+                            <td class="col-md-1" id="name">...</td>
+                            <td class="col-md-1" id="state">...</td>
+                            <td class="col-md-1" id="start">...</td>
+                            <td class="col-md-1" id="end">...</td>
+                        </tr>
+                    </tbody>
+                </table>
+            </div>
+        </div>
+
+        <div class="panel panel-primary">
+            <div class="panel-heading">考试详情</div>
+            <div class="panel-body">
+                <table class="table table-striped">
+                    <thead>
+                        <tr>
+                            <th class="col-md-1">编号</th>
+                            <th class="col-md-3"> </th>
+                            <th class="col-md-1">题目操作</th>
+                        </tr>
+                    </thead>
+                    <tbody id="detail"></tbody>
+                </table>
+            </div>
+        </div>
+    </div>
+    <script>
+        function getQueryVariable(variable) {
+            var query = window.location.search.substring(1);
+            var vars = query.split("&");
+            for (var i = 0; i < vars.length; i++) {
+                var pair = vars[i].split("=");
+                if (pair[0] == variable) {
+                    return pair[1];
+                }
+            }
+            return (false);
+        }
+        function qidEncode(str = "") {
+            let len = str.length;
+            let res = "";
+            // for (let i = 0; i < len; i++) res += String.fromCharCode((str[i].charCodeAt() + len) % 93 + 33);
+            return res;
+        }
+        $.ajax({
+            type: "POST",
+            url: "http://mengxun.online/api/oj/exam/" + getQueryVariable("eid"),
+            contentType: "application/json",
+            data: JSON.stringify({
+                identity: "student"
+            }),
+            dataType: "json",
+            success: function (res) {
+                if (res.code != 0) alert("oops! some error happend.");
+                else {
+                    // 显示概览
+                    let data = res.data;
+                    $("#name").text(data.Name);
+                    if (data.State == 0) $("#state").text("未开始").css("color", "gray");
+                    else if (data.State == 1) $("#state").text("进行中").css("color", "green");
+                    else $("#state").text("已结束").css("color", "red");
+                    let start = new Date(data.Start);
+                    let end = new Date(data.End);
+                    $("#start").text(start.getFullYear() + "-" + (start.getMonth() + 1) + "-" + start.getDate()+" "+start.getHours()+":"+start.getMinutes()+":"+start.getSeconds());
+                    $("#end").text(end.getFullYear() + "-" + (end.getMonth() + 1) + "-" + end.getDate()+" "+end.getHours()+":"+end.getMinutes()+":"+end.getSeconds());
+                
+                    // 显示题目列表
+                    let list = res.data.Qids;
+                    list.forEach((e, i) => {
+                        let code = qidEncode(e);
+                        let line = "<tr><td class='col-md-1'>" + (i + 1) + "</td><td class='col-md-3'>" + code + "</td>";
+                        line += "<td class='col-md-1'><button rel='" + e + "'>做题</button></td></tr>";
+                        $("#detail").append($(line));
+                    });
+                    $("#detail button").click(function () {
+                        window.location.href = "detail.html?qid=" + $(this).attr("rel") + "&uid=" + getQueryVariable("uid");
+                    });
+                }
+            }
+        });
+    </script>
+</body>
+<html>

@@ -1,0 +1,90 @@
+<!DOCTYPE html>
+<html lang="zh">
+
+<head>
+    <meta charset="utf-8">
+    <title>考题</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <style>
+        #problemContent {
+            margin: 50px;
+        }
+    </style>
+    <link rel="stylesheet" href="../style/bootstrap.min.css">
+    <script src="../script/ace.js" type="text/javascript" charset="utf-8"></script>
+    <script src="../script/ext-language_tools.js" type="text/javascript" charset="utf-8"></script>
+    <script src="../script/jquery.js"></script>
+</head>
+
+<body>
+    <div id="problemContent" ng-controller="problemCtr">
+        <div class="panel panel-primary">
+            <div class="panel-heading">考试信息</div>
+            <div class="panel-body">
+                <table class="table table-striped">
+                    <thead>
+                        <tr>
+                            <th class="col-md-1">考试编号</th>
+                            <th class="col-md-3"> </th>
+                            <th class="col-md-2">考试操作</th>
+                        </tr>
+                    </thead>
+                    <tbody id="exams"></tbody>
+                </table>
+            </div>
+            <ul class="pager">
+                <li><a href="javascript:;" ng-if="isCanPre" ng-click="changePage(false)">&laquo;上一页</a></li>
+                </span>
+                </li>
+                <li><a href="javascript:;" ng-if="isCanNext" ng-click="changePage(true)">下一页&raquo;</a></li>
+            </ul>
+        </div>
+    </div>
+    <script>
+        function getQueryVariable(variable) {
+            var query = window.location.search.substring(1);
+            var vars = query.split("&");
+            for (var i = 0; i < vars.length; i++) {
+                var pair = vars[i].split("=");
+                if (pair[0] == variable) {
+                    return pair[1];
+                }
+            }
+            return (false);
+        }
+        function qidEncode(str = "") {
+            let len = str.length;
+            let res = "";
+            // for (let i = 0; i < len; i++) res += String.fromCharCode((str[i].charCodeAt() + len) % 93 + 33);
+            return res;
+        }
+        $.ajax({
+            type: "POST",
+            url: "http://mengxun.online/api/oj/exam/list",
+            contentType: "application/json",
+            data: JSON.stringify({
+                identity: "student",
+                //sid: getQueryVariable("uid")
+                sid: "715b7652-dca7-46fd-8df0-47b12ea4f41"
+            }),
+            dataType: "json",
+            success: function (res) {
+                console.log(res);
+                if (res.code != 0) alert("oops! some error happend.");
+                else {
+                    let data = res.data.Commits;
+                    data.forEach((e, i) => {
+                        let code = qidEncode(e);
+                        let line = "<tr><td class='col-md-1'>" + (i + 1) + "</td><td class='col-md-3'>" + code + "</td>";
+                        line += "<td class='col-md-1'><button rel='" + e + "'>进入</button></td></tr>";
+                        $("#exams").append($(line));
+                    });
+                    $("#exams button").click(function () {
+                        window.location.href = "examDetail.html?eid=" + $(this).attr("rel") + "&uid=" + getQueryVariable("uid");
+                    });
+                }
+            }
+        });
+    </script>
+</body>
+<html>
